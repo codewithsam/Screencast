@@ -1,0 +1,233 @@
+<?php
+	session_start();
+	ob_start();
+	
+require( 'include/flash.php' );
+include_once('include/header.php');
+	$pid = isset($_GET["id"]) ? mysqli_real_escape_string($db_conx,$_GET["id"]) : null;
+
+	if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == true){
+		$memid =  $_SESSION["id"];
+		if(isset($_POST["commentsub"])){
+			$cmtr = isset($_POST["commenter"]) ? mysqli_real_escape_string($db_conx,$_POST["commenter"]) : null;
+			if(isset($cmtr)){
+				$cmqr = mysqli_query($db_conx,"INSERT INTO comments(member_id,post_id,comment,rate,created_at,updated_at) VALUES('$memid','$pid','$cmtr','5',now(),now())");
+			}
+			
+		}
+	}
+
+?>
+	<div class="content">
+		<div class="contentWrapper">
+			<div class="contentContainer container">
+				<div class="post-header">
+					<ul class="nav nav-tabs">
+						<li role="presentation" class="active"><a href="#">Overview</a></li>
+						<li role="presentation"><a href="#">Description</a></li>
+						<li role="presentation"><a href="#">Reviews</a></li>
+						<li role="presentation"><a href="#">Related</a></li>
+					</ul>
+				</div>
+				<?php
+					$sql = "SELECT * from posts inner join category on posts.category_id = category.id inner join members on posts.member_id = members.id where posts.id = '$pid'";
+					$query = mysqli_query($db_conx,$sql);
+					$row = mysqli_fetch_row($query);
+
+				?>
+				<div class="post-databox col-xs-12 col-sm-8">
+					<div class="pdb-post">
+						<div class="pdb-header row">
+							<h5><?php echo $row['1']; ?></h5>
+						</div>
+						<div class="row pdb-cat">
+							<div class="col-xs-4"><?php echo $row['10']; ?></div>
+							<div class="col-xs-4 pdp-rate">
+								<ul>
+									<li><i class="fa fa-circle"></i></li>
+									<li><i class="fa fa-circle"></i></li>
+									<li><i class="fa fa-circle"></i></li>
+									<li><i class="fa fa-circle"></i></li>
+									<li><i class="fa fa-circle"></i></li>
+								</ul>
+								<div class="pull-right">22 Reviews</div>
+							</div>
+							<div class="col-xs-4"><i class="fa fa-clock-o"></i> 4 Days On Average</div>
+						</div>
+						<div class="post-image">
+							<?php echo '<img src="postupload/'.$row["3"].'" alt="">';?>
+							
+						</div>
+					</div>
+					<div class="post-description">
+						<div class="post-pdb-head">About This Gig</div>	
+							<p>
+								<?php echo $row['4']; ?>
+							</p>
+					</div>
+					<div class="post-order">
+						<div class="row">
+							<div class="col-xs-12 po-order">
+								<?php
+									echo '<a href="board.php?cid='.$pid.'"><button class="btn btn-success btn-block"><i class="flaticon-11"></i> Join Class</button></a>';
+								?>
+							</div>
+						</div>
+					</div>
+					<div class="commentBox">
+						<div class="post-pdb-head">33 Reviews
+						 	<span class="pull-right">
+								<div class="dropdown">
+								  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+								    Dropdown
+								    <span class="caret"></span>
+								  </button>
+								  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+								    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+								    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
+								    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
+								    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
+								  </ul>
+								</div>
+							</span>
+						</div>	
+						<div class="commentb-cmt">
+							<ul>
+								<li>
+									<div class="row cat-row">
+										<div class="col-xs-4 cbc-ratecat">
+											<h5>Self Communication</h5>
+											<ul>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+											</ul>
+										</div>
+										<div class="col-xs-4 cbc-ratecat">
+											<h5>Service Described</h5>
+											<ul>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+											</ul>
+										</div>
+										<div class="col-xs-4 cbc-ratecat">
+											<h5>Would Recommend</h5>
+											<ul>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+												<li><i class="fa fa-circle"></i></li>
+											</ul>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="box-troll">
+
+										<div class="troll-textbox">
+											<?php
+												if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == true){
+													echo '<form action="" method="POST">
+															<textarea placeholder="Write something about this class" name="commenter" class="form-control"></textarea>
+															<button type="submit" name="commentsub" class="btn btn-default" style="margin-top:20px;">Submit</button>	
+														</form>	';
+												}else{
+													echo '<h3>Please Login To Comment</h3>
+															<button class="btn btn-block btn-large btn-primary" data-toggle="modal" data-target="#login">Login</button>
+														';
+												}
+											?>
+																				
+										</div>
+									</div>
+								</li>
+								<?php
+									$cmtqry = mysqli_query($db_conx,"SELECT comments.*,members.username,members.avatar FROM comments INNER JOIN members ON comments.member_id = members.id WHERE post_id = '$pid'");
+
+									while($crr = mysqli_fetch_assoc($cmtqry)){
+										echo '<li class="cmt-userthought">
+											<div class="row">
+												<div class="cmt-thumb col-sm-3 col-md-2 col-xs-4"><img src="avatar/'.$crr["avatar"].'" width="50px" height="50px" alt=""></div>
+												<div class="cmt-text col-sm-9 col-md-10 col-xs-4">
+													<div class="cmt-usr">
+														<span>'.$crr['username'].'</span>
+													</div>
+													<div class="cmt-txt">
+														<span>'.$crr['comment'].'</span>
+													</div>
+													<div class="cmt-date">'.$crr['updated_at'].'</div>
+												</div>
+											</div>
+										</li>';
+									}
+
+									
+								?>
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="rb-userprofile">
+						<div class="rbu-avatar">
+							<?php echo '<img src="avatar/'.$row["20"].'" alt="">'; ?>
+							<a href="#"><?php echo $row["15"]; ?></a>
+						</div>
+						<div class="rbu-userabout">
+							<div class="row">
+								<div class="col-xs-6">
+									<h6>From</h6>
+									<span><?php echo $row["21"]; ?></span>
+								</div>
+								<div class="col-xs-6">
+									<h6>E-Mail</h6>
+									<span><?php echo $row["14"]; ?></span>
+								</div>
+								<div class="col-xs-6">
+									<h6>Speaks</h6>
+									<span><?php echo $row["22"]; ?></span>
+								</div>
+								<div class="col-xs-6">
+									<h6>Joined On</h6>
+									<span>2015-03-03 </span>
+								</div>
+							</div>
+						</div>
+						<div class="rbu-userbio">
+							<p>
+								<?php
+									if($row["23"] != "" || $row["23"] != NULL){
+										echo $row["23"];
+									}else{
+									echo 'User has not specified anything about himself.';
+								}
+								?>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php include_once("include/logsign.php"); ?>
+	 <script>
+	// 	jQuery(document).ready(function($) {
+	// 		$('.carousel').carousel();
+	// 	});
+	jQuery(document).ready(function($) {
+		$('.troll-star >ul>li>i').hover(function() {
+			$(this).prevAll().andSelf().removeClass('fa-star-o').prevAll().andSelf().addClass('fa-star');
+		}, function() {
+			$(this).prevAll().andSelf().removeClass('fa-star').addClass('fa-star-o');
+		});
+	});
+	 </script>
+</body>
+</html>

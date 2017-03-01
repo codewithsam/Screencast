@@ -1,0 +1,419 @@
+<?php
+   session_start();
+   ob_start();
+   include_once("include/db_conx.php");
+   require( 'include/flash.php' );
+
+   if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == true){
+   }else{
+      if(isset($_POST["signup"])){
+         $u = (isset($_POST["username"])) ? mysqli_real_escape_string($db_conx,$_POST["username"]) : NULL;
+         $e = (isset($_POST["email"])) ? mysqli_real_escape_string($db_conx,$_POST["email"]) : NULL;
+         $p = (isset($_POST["password"])) ? mysqli_real_escape_string($db_conx,$_POST["password"]) : NULL;
+         $pc = (isset($_POST["password_confirmation"])) ? mysqli_real_escape_string($db_conx,$_POST["password_confirmation"]) : NULL;
+         $warn = "";
+         if(!$u){
+            flash( 'warning_class', 'Username field cannot be left blank', 'error' );
+         }
+         if(!$e){
+            flash( 'warning_class', 'E-Mail field cannot be left blank', 'error' );
+         }
+         if(!$p){
+            flash( 'warning_class', 'Password field cannot be left blank', 'error' );
+         } 
+         if(!$pc){
+               flash( 'warning_class', 'Please Confirm your password', 'error' );
+         }
+         if ($p != $pc) {
+               flash( 'warning_class', 'Password doen not match with the confirmed password', 'error' );
+         }
+         if($u && $e && $p && $pc && $p == $pc){
+            $sql = "INSERT INTO members(email,username,password,verified) VALUES ('$e', '$u', '$p', '1')";
+            $qry = mysqli_query($db_conx, $sql);
+            if($qry){
+               flash( 'success_message', 'You are successfully registered');
+            }
+         }
+      }
+      if(isset($_POST["login"])){
+         $e = (isset($_POST["email"])) ? mysqli_real_escape_string($db_conx,$_POST["email"]) : NULL;
+         $p = (isset($_POST["password"])) ? mysqli_real_escape_string($db_conx,$_POST["password"]) : NULL;
+         if(!$e){
+            flash( 'warning_class', 'Please Enter your E-Mail', 'error' );
+         }
+         if(!$p){
+            flash( 'warning_class', 'Please Enter your Password', 'error' );
+         }
+         if($e && $p){
+            $sql = "SELECT * FROM members where email = '$e' AND password = '$p' LIMIT 1";
+            $query = mysqli_query($db_conx,$sql);
+            if(!$query){
+               $er = 'Could not run query: ' . mysqli_error($db_conx);
+                flash( 'warning_class', $er, 'error' );
+            }
+            if(mysqli_num_rows($query) > 0){
+               $row = mysqli_fetch_row($query);
+               if(!$row){
+                  $er = 'Could not run query: ' . mysqli_error($db_conx);
+                  flash( 'warning_class', $er, 'error' );
+               }
+               $_SESSION["loggedin"] = true;
+               $_SESSION["id"] = $row[0];
+               $_SESSION["email"] = $row[1];
+               $_SESSION["username"] = $row[2];
+               $_SESSION["avatar"] = $row[7];
+               flash( 'success_message', 'You are successfully Logged in');
+            }else{
+               flash( 'warning_class', "Your username or password is incorrect", 'error' );
+            }
+         }
+      }
+   }
+
+   
+?>
+
+<?php
+   include_once("include/header.php");
+?>
+
+
+
+ 	<div class="banner">
+		<div class="banner-section">
+			<h1>Need Some Work Done?</h1>
+			<h3>Hire someone for your Work</h3>
+			<form class="banner-form" action="search.php" method="GET">
+				<div>
+					<input type="text" placeholder="I want: " name="search">
+					<button><i class="fa fa-search"></i></button>
+				</div>
+			</form>
+			<h3>OR</h3>
+         <?php
+            if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == true){
+               echo '<a href="newgig.php"><button class="btn btn-success banner-ican">Earn From Your Talent</button></a>';
+            }else{
+               echo '<button class="btn btn-success banner-ican" data-toggle="modal" data-target="#signup">Earn From Your Talent</button>';
+            }
+         ?>
+		</div>
+	</div>
+	<div class="content">
+		<div class="content-header">
+			<div class="content-header-container row">
+				<div class="col-sm-4 chc-trend">
+					<ul>
+					</ul>
+				</div>
+				<div class="col-sm-4 chc-metro">
+					
+				</div>
+				<div class="col-sm-4 chc-filter">
+					<ul>
+						<li>
+							<div class="icon1"></div>
+						</li>
+						<li>
+							<div class="icon2"></div>
+						</li>
+						<li>
+							<div class="icon3"></div>
+						</li>
+						<li>
+							<div class="icon4"></div>
+						</li>
+						<li>
+							<div class="icon5"></div>
+						</li>
+						<li>
+							<div class="icon6"></div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="content_middle">
+   	  <div class="container">
+   	    <div class="content_middle_box">
+          <div class="top_grid">
+   			<div class="col-md-3">
+   			  <div class="grid1">
+   				<a href="search.php?cat=5"><div class="view view-first">
+                  
+                     <div class="index_img"><img src="postupload/ne8fn7z77vlg0tndtoepyjrhy8yjpnpv8vwtgox53m8o0vtf24.jpg" class="img-responsive" alt=""/></div>
+   			      
+                      <div class="mask">
+                        <div class="info"><i class="search"> </i>Show More</div>
+                        <ul class="mask_img">
+                        	<li class="star"><img src="img/star.png" alt=""/></li>
+                        	<li class="set"><img src="img/set.png" alt=""/></li>
+                        	<div class="clearfix"> </div>
+                        </ul>
+                       </div>
+                   </div>
+               
+                   <i class="home"></i>
+   				</a> 
+                <div class="inner_wrap">
+   				 	<h3>Get your Java assignment Done</h3>
+   				 	<ul class="star1">
+   				 	  <h4 class="green">Java</h4>
+   				 	  <li><a href="#"> <img src="img/star1.png" alt="">(3)</a></li>
+   				 	</ul>
+   				 </div>
+   			   </div>
+   			</div>
+   			<div class="col-md-3">
+   			  <div class="grid1">
+               <a href="search.php?cat=11">
+   				<div class="view view-first">
+                  <div class="index_img1"><img src="img/chemistry.jpg" class="img-responsive" alt=""/></div>
+   				     <div class="mask">
+                        <div class="info"><i class="search"> </i> Show More</div>
+                        <ul class="mask_img">
+                        	<li class="star"><img src="img/star.png" alt=""/></li>
+                        	<li class="set"><img src="img/set.png" alt=""/></li>
+                        	<div class="clearfix"> </div>
+                        </ul>
+                      </div>
+                  </div> 
+                 <i class="home1"> </i>
+              </a>
+   				 <div class="inner_wrap">
+   				 	<h3>Get Your Chemistry Assignment Done</h3>
+   				 	<ul class="star1">
+   				 	  <h4 class="yellow">Chemestry</h4>
+   				 	  <li><a href="#"> <img src="img/star2.png" alt="">(4)</a></li>
+   				 	</ul>
+   				 </div>
+   			   </div>
+   			</div>
+   			<div class="col-md-3">
+   			  <div class="grid1">
+               <a href="search.php?cat=2">
+   				<div class="view view-first">
+                  <div class="index_img2"><img src="img/math.jpg" class="img-responsive" alt=""/></div>
+   				     <div class="mask">
+                        <div class="info"><i class="search"> </i> Show More</div>
+                        <ul class="mask_img">
+                        	<li class="star"><img src="img/star.png" alt=""/></li>
+                        	<li class="set"><img src="img/set.png" alt=""/></li>
+                        	<div class="clearfix"> </div>
+                        </ul>
+                      </div>
+                  </div> 
+                 <i class="home2"> </i></a>
+   				 <div class="inner_wrap">
+   				 	<h3>Get math assignment done</h3>
+   				 	<ul class="star1">
+   				 	  <h4 class="blue">Maths</h4>
+   				 	  <li><a href="#"> <img src="img/star2.png" alt="">(6)</a></li>
+   				 	</ul>
+   				 </div>
+   			   </div>
+   			</div>
+   			<div class="col-md-3">
+   			  <div class="grid1">
+               <a href="search.php?cat=12">
+   				<div class="view view-first">
+                  <div class="index_img"><img src="img/logoDBMS.jpg" class="img-responsive" alt=""/></div>
+   			          <div class="mask">
+                      <div class="info"><i class="search"> </i> Show More</div>
+                        <ul class="mask_img">
+                        	<li class="star"><img src="img/star.png" alt=""/></li>
+                        	<li class="set"><img src="img/set.png" alt=""/></li>
+                        	<div class="clearfix"> </div>
+                        </ul>
+                      </div>
+                  </div> 
+                  <i class="home"></i>
+               </a>
+   				  <div class="inner_wrap">
+   				 	<h3>I can do 5 Queries for $5</h3>
+   				 	<ul class="star1">
+   				 	  <h4 class="green">DBMS</h4>
+   				 	  <li><a href="#"> <img src="img/star1.png" alt="">(2)</a></li>
+   				 	</ul>
+   				  </div>
+   			   </div>
+   			</div>
+   			<div class="clearfix"> </div>
+   		</div>
+   	    <div class="middle_grid wow fadeInUp" data-wow-delay="0.4s">
+   			<div class="col-md-6">
+   			   <div class="grid1">
+                  <a href="search.php?cat=9">
+   			     <div class="index_img"><img src="img/biologybanner.jpg" class="img-responsive" alt=""/></div>
+   				  <i class="m_home"> </i>
+                  <ul class="vision">
+                  	 <li>Biology Classes</li>
+                  	 <li class="desc"><a href="#"> <img src="img/star1.png" alt="">(5)</a></li>
+                  </ul>
+   				  <div class="inner_wrap1">
+   				 	<ul class="item_module">
+   				 	 	<li class="module_left"><img src="img/m1.jpg" class="img-responsive" alt=""/></li>
+   				 	 	<li class="module_right">
+   				 	 		<img src="img/m_star.png" class="img-responsive" alt=""/>
+   				 	 		<h5>Networking</h5>
+   				 	 		<p>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies n</p>
+   				 	 		<a href="#" class="content_btn">....read more</a>
+   				 	 	</li>
+   				 	 	<div class="clearfix"> </div>
+   				 	 </ul>
+   				  </div>
+               </a>
+   			   </div>
+   			</div>
+   			<div class="col-md-6">
+   			   <div class="grid1">
+                  <a href="search.php?cat=4">
+   			     <div class="index_img1"><img src="img/c++.jpg" class="img-responsive" alt=""/></div>
+   				  <i class="m_home1"> </i>
+                  <ul class="vision">
+                  	 <li>C ++</li>
+                  	 <li class="desc"><a href="#"> <img src="img/star2.png" alt="">(1)</a></li>
+                  </ul>
+   				  <div class="inner_wrap1">
+   				 	<ul class="item_module">
+   				 	 	<li class="module_left"><img src="img/m2.jpg" class="img-responsive" alt=""/></li>
+   				 	 	<li class="module_right">
+   				 	 		<img src="img/m_star1.png" class="img-responsive" alt=""/>
+   				 	 		<h5>C++ Language</h5>
+   				 	 		<p>C++ is a general-purpose programming language. It has imperative, object-oriented and generic programming features, while also providing the facilities for low-level memory manipulation.</p>
+   				 	 		<a href="#" class="content_btn">....read more</a>
+   				 	 	</li>
+   				 	 	<div class="clearfix"> </div>
+   				 	 </ul>
+   				  </div>
+               </a>
+   			   </div>
+   			</div>
+   			<div class="clearfix"> </div>
+   		</div>
+   			<div class="clearfix"> </div>
+   		</div>
+   		<div class="bottom_grid wow bounce" data-wow-delay="0.4s">
+   		  <div class="col-md-6">
+   			   <div class="grid1">
+                  <a href="search.php?cat=7">
+   			     <div class="index_img1"><img src="img/python.jpg" class="img-responsive" alt=""/></div>
+   				  <i class="m_home1"> </i>
+                  <ul class="vision">
+                  	 <li>Python Programming</li>
+                  	 <li class="desc"><a href="#"> <img src="img/star2.png" alt="">(236)</a></li>
+                  </ul>
+   				  <div class="inner_wrap1">
+   				 	<ul class="item_module">
+   				 	 	<li class="module_left"><img src="img/m2.jpg" class="img-responsive" alt=""/></li>
+   				 	 	<li class="module_right">
+   				 	 		<img src="img/m_star.png" class="img-responsive" alt=""/>
+   				 	 		<h5>Python</h5>
+   				 	 		<p>Python is a widely used general-purpose, high-level programming language.Its design philosophy emphasizes code readability.</p>
+   				 	 		<a href="#" class="content_btn">....read more</a>
+   				 	 	</li>
+   				 	 	<div class="clearfix"> </div>
+   				 	 </ul>
+   				  </div></a>
+   			   </div>
+   			</div>
+   			<div class="col-md-3">
+   			  <div class="grid1">
+               <a href="search.php?cat=10">
+   				<div class="view view-first">
+                  <div class="index_img"><img src="img/physics.jpg" class="img-responsive" alt=""/></div>
+   			          <div class="mask">
+                      <div class="info"><i class="search"> </i> Show More</div>
+                        <ul class="mask_img">
+                        	<li class="star"><img src="img/star.png" alt=""/></li>
+                        	<li class="set"><img src="img/set.png" alt=""/></li>
+                        	<div class="clearfix"> </div>
+                        </ul>
+                      </div>
+                  </div> 
+                  <i class="b_home"></i>
+   				  <div class="inner_wrap2">
+   				 	<h3>10th Physics Assignment</h3>
+   				 	<ul class="star1">
+   				 	  <h4 class="green">Physics</h4>
+   				 	  <li><a href="#"> <img src="img/star1.png" alt="">(6)</a></li>
+   				 	</ul>
+   				  </div>
+   			   </div>
+   			</div>
+   			<div class="col-md-3">
+   			  <div class="grid1">
+                  <a href="search.php?cat=8">
+   				<div class="view view-first">
+                  <div class="index_img1"><img src="img/csharp.jpg" class="img-responsive" alt=""/></div>
+   				     <div class="mask">
+                        <div class="info"><i class="search"> </i> Show More</div>
+                        <ul class="mask_img">
+                        	<li class="star"><img src="img/star.png" alt=""/></li>
+                        	<li class="set"><img src="img/set.png" alt=""/></li>
+                        	<div class="clearfix"> </div>
+                        </ul>
+                      </div>
+                  </div> 
+                 <i class="b_home1"> </i></a>
+   				 <div class="inner_wrap2">
+   				 	<h3>Hire for C# Management System</h3>
+   				 	<ul class="star1">
+   				 	  <h4 class="yellow">C# Language</h4>
+   				 	  <li><a href="#"> <img src="img/star2.png" alt="">(5)</a></li>
+   				 	</ul>
+   				 </div>
+   			   </div>
+   			</div>
+   			<div class="clearfix"></div>
+   			</div>
+   		  </div>
+   		  <div class="offering">
+   		  	  <h2>What can Giglist offer to you ?</h2>
+   		  	  <h3>Try us and find it out.</h3>
+   		  	  <ul class="icons wow fadeInUp" data-wow-delay="0.4s">
+   		  	  	 <li><i class="icon1"> </i><span class="one"> </span></li>
+   		  	  	 <li><i class="icon2"> </i><span class="two"> </span></li>
+   		  	  	 <li><i class="icon3"> </i><span class="three"> </span></li>
+   		  	  	 <li><i class="icon4"> </i><span class="four"> </span></li>
+   		  	  	 <li><i class="icon5"> </i></li>
+   		  	  </ul>
+   		  	  <div class="real">
+   		  	  	<h4>Reality</h4>
+   		  	  	<div class="col-sm-6">
+   		  	  	  <ul class="service_grid">
+   	   				<i class="s1"> </i>
+   	   				 <li class="desc1 wow fadeInRight" data-wow-delay="0.4s">
+   	   				   <p>Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem.</p>
+   	   				 </li>
+   	   				 <div class="clearfix"> </div>
+   	   			   </ul>
+   	   			 </div>
+   	   			 <div class="col-sm-6">
+   		  	  	  <ul class="service_grid">
+   	   				<i class="s2"> </i>
+   	   				 <li class="desc1 wow fadeInRight" data-wow-delay="0.4s">
+   	   				   <p>dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. </p>
+   	   				 </li>
+   	   				 <div class="clearfix"> </div>
+   	   			   </ul>
+   	   			 </div>
+   	   			 <div class="clearfix"> </div>
+   	   			 </div>
+   		  	  </div>
+   		  </div>
+   	  </div>
+	</div>
+
+   <?php include_once("include/logsign.php"); ?>
+
+
+<script>
+	jQuery(document).ready(function($) {
+		$('.metro-drop').click(function(event) {
+			$(this).children('ul').toggleClass('hidden');
+		});
+	});
+</script>
+</body>
+</html>
